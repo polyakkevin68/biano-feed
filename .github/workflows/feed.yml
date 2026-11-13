@@ -4,6 +4,8 @@ on:
   schedule:
     - cron: "15 */3 * * *"   # 3 óránként (a Biano 4 óránként tölt le)
   workflow_dispatch:
+  push:
+    branches: [main]
 
 permissions:
   contents: read
