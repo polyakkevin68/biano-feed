@@ -28,7 +28,7 @@ jobs:
       - name: Feed generálása
         run: |
           mkdir -p public
-          python generate_feed.py -o public/biano_feed.xml
+          python generate_feed.py -o public/biano_feed.xml --category "Masszázsfotel" --brand "HC Home" --min-products 5
       - uses: actions/upload-pages-artifact@v3
         with:
           path: public

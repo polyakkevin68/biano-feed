@@ -168,6 +168,12 @@ def main() -> int:
     ap.add_argument("--include-out-of-stock", action="store_true",
                     help="az elfogyott termékeket is betenni (alapból kimaradnak, hogy ne fizessen rájuk kattintást)")
     ap.add_argument("--workers", type=int, default=4)
+    ap.add_argument("--min-products", type=int, default=10,
+                    help="ennél kevesebb termék esetén nem írja felül a feedet (védelem hibás futás ellen)")
+    ap.add_argument("--category", default="",
+                    help="csak az ezt tartalmazó kategóriájú termékek (kis/nagybetű nem számít), pl. Masszázsfotel")
+    ap.add_argument("--brand", default="",
+                    help="csak az ezzel kezdődő gyártójú termékek, pl. 'HC Home'")
     args = ap.parse_args()
 
     urls = product_urls()
@@ -187,13 +193,17 @@ def main() -> int:
     for p in results:
         if not p or p["id"] in seen:
             continue
+        if args.category and args.category.lower() not in p["category"].lower():
+            continue
+        if args.brand and not p["brand"].lower().startswith(args.brand.lower()):
+            continue
         if not args.include_out_of_stock and AVAILABILITY.get(p["availability"], 0) is None:
             skipped_stock += 1
             continue
         seen.add(p["id"])
         products.append(p)
 
-    if len(products) < 10:
+    if len(products) < args.min_products:
         print("Túl kevés termék, a feed nem lett felülírva.", file=sys.stderr)
         return 1
 
